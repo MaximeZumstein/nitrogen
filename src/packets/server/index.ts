@@ -1,8 +1,22 @@
-import { PacketList } from "../Packet";
-import Handshake from "./Handshake";
+import { SocketPlayerState } from "../../sockets/SocketPlayer";
+import { ServerPacketList } from "../Packet";
+import Handshake from "./handshaking/Handshake";
+import LoginStart from "./login/LoginStart";
+import PingRequest from "./status/PingRequest";
+import StatusRequest from "./status/StatusRequest";
 
-const ServerBoundPackets = {
-    0x00: Handshake
-} as PacketList;
+const ServerBoundPackets: Record<SocketPlayerState, ServerPacketList> = {
+    [SocketPlayerState.HANDSHAKING]: {
+        0x00: Handshake
+    },
+    [SocketPlayerState.STATUS]: {
+        0x00: StatusRequest,
+        0x01: PingRequest,
+    },
+    [SocketPlayerState.LOGIN]: {
+        0x00: LoginStart,
+    },
+    [SocketPlayerState.PLAY]: {},
+}
 
 export {ServerBoundPackets};

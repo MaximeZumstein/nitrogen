@@ -1,6 +1,8 @@
+import { Uuid } from "../utils/Uuid";
+
 class SocketBuffer {
-    private bufferPos = 0;
-    constructor(private buffer: Buffer) {}
+    public bufferPos = 0;
+    constructor(public buffer: Buffer) {}
 
     readVarInt() {
         let value = 0;
@@ -20,6 +22,10 @@ class SocketBuffer {
         return value;
     }
 
+    readBoolean() {
+        return this.buffer[this.bufferPos++] === 0x01;
+    }
+
     readString() {
         const length = this.readVarInt();
         const value = this.buffer.subarray(this.bufferPos, this.bufferPos + length).toString('utf8');
@@ -35,9 +41,58 @@ class SocketBuffer {
         return value;
     }
 
+    readLong() {
+        const value = this.buffer.readBigInt64BE(this.bufferPos);
+        this.bufferPos += 8;
+
+        return value;
+    }
+
     pos() {
         return this.bufferPos;
     }
 }
 
-export default SocketBuffer;
+const readUuid = (buffer: SocketBuffer): Uuid => {
+    let uuid = "";
+
+    for(let i = 0; i < 16; i++) {
+        if([4, 6, 8, 10].indexOf(i) !== -1) {
+            uuid += "-";
+        }
+        uuid += buffer.buffer[buffer.bufferPos + i].toString(16).padStart(2, '0');
+    }
+    buffer.bufferPos += 16;
+
+    return uuid;
+}
+
+const writeVarInt = (value: number): Buffer => {
+    let bytes:number[] = [];
+
+    while(true) {
+        if((value & ~0x7F) == 0) {
+            bytes.push(value);
+            break;
+        }
+
+        bytes.push((value & 0x7F) | 0x80);
+        value >>>= 7;
+    }
+
+    return Buffer.from(bytes);
+}
+
+const writeString = (value: string): Buffer => {
+    const buffer = Buffer.from(value, 'utf-8');
+    return Buffer.concat([writeVarInt(value.length) , buffer]);
+}
+
+const writeLong = (value: bigint): Buffer => {
+    const buffer = Buffer.alloc(8);
+    buffer.writeBigInt64BE(value);
+
+    return buffer;
+}
+
+export {SocketBuffer, writeVarInt, writeString, writeLong, readUuid};

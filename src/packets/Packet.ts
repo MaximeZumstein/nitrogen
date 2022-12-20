@@ -1,10 +1,16 @@
-import SocketBuffer from "../sockets/SocketBuffer";
+import { SocketBuffer } from "../sockets/SocketBuffer";
+import { SocketPlayerState } from "../sockets/SocketPlayer";
 
 export type Packet = {
-    id: number
+    id: number,
+    state: SocketPlayerState,
 }
 
-export interface PacketList {
+export interface ServerPacketList {
     [index: number]: (buffer: SocketBuffer) => Packet;
+}
+
+export interface ClientPacketList {
+    [index: number]: (packet: any) => Buffer;
 }
 

@@ -1,21 +1,18 @@
-import SocketBuffer from "../../sockets/SocketBuffer";
-import { Packet } from "../Packet";
+import { SocketBuffer } from "../../../sockets/SocketBuffer";
+import { SocketPlayerState } from "../../../sockets/SocketPlayer";
+import { Packet } from "../../Packet";
 
-enum NextState {
-    Status = 1,
-    Login = 2,
-}
-
-type HandshakePacket = Packet & {
+export type HandshakePacket = Packet & {
     protocolVersion: number,
     serverAddress: string,
     serverPort: number,
-    nextState: NextState,
+    nextState: SocketPlayerState,
 }
 
 const Handshake = (buffer: SocketBuffer): HandshakePacket => {
     return {
         id: 0x00,
+        state: SocketPlayerState.HANDSHAKING,
         protocolVersion: buffer.readVarInt(),
         serverAddress: buffer.readString(),
         serverPort: buffer.readUnsignedShort(),
