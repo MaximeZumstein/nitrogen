@@ -1,4 +1,4 @@
-import { writeVarInt, writeLong, writeString } from "../../../sockets/SocketBuffer";
+import { writeVarInt, writeString, writeUuid } from "../../../sockets/SocketBuffer";
 import { Uuid } from "../../../utils/Uuid";
 import { Packet } from "../../Packet";
 

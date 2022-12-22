@@ -7,7 +7,7 @@ export enum SocketPlayerState {
     PLAY = 3,
 }
 
-type SocketPlayer = {
+export type SocketPlayer = {
     socket: Socket,
     state: SocketPlayerState
 }
