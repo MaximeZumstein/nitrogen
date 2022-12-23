@@ -1,10 +1,10 @@
-import { SocketBuffer } from "../../../sockets/SocketBuffer";
+import { BufferCursor } from "../../../sockets/SocketBuffer";
 import { SocketPlayerState } from "../../../sockets/SocketPlayer";
 import { Packet } from "../../Packet";
 
 export type StatusRequestPacket = Packet
 
-const StatusRequest = (buffer: SocketBuffer): StatusRequestPacket => {
+const StatusRequest = (buffer: BufferCursor): StatusRequestPacket => {
     return {
         id: 0x00,
         state: SocketPlayerState.STATUS,

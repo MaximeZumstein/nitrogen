@@ -3,7 +3,9 @@ import { createServer } from "net";
 import { ClientBoundPackets } from "./packets/client";
 import { LoginSuccessPacket } from "./packets/client/login/LoginSuccess";
 import { Gamemode, LoginPacket } from "./packets/client/play/LoginPacket";
+import { SetHeldItemPacket } from "./packets/client/play/SetHeldItem";
 import { SynchronizePlayerPositionPacket } from "./packets/client/play/SynchronizePlayerPosition";
+import { UpdateRecipesPacket } from "./packets/client/play/UpdateRecipes";
 import { PingResponsePacket } from "./packets/client/status/PingResponse";
 import { StatusResponsePacket } from "./packets/client/status/StatusResponse";
 import { Packet } from "./packets/Packet";
@@ -11,7 +13,7 @@ import { ServerBoundPackets } from "./packets/server";
 import { HandshakePacket } from "./packets/server/handshaking/Handshake";
 import { LoginStartPacket } from "./packets/server/login/LoginStart";
 import { PingRequestPacket } from "./packets/server/status/PingRequest";
-import { SocketBuffer, writeString, writeUuid } from "./sockets/SocketBuffer";
+import SocketBuffer from "./sockets/SocketBuffer";
 import { initSocketPlayer, SocketPlayer, SocketPlayerState } from "./sockets/SocketPlayer";
 import { Registry } from "./utils/Registry";
 
@@ -70,7 +72,6 @@ const handlePacket = (serverPacket: any, socketPlayer: SocketPlayer) => {
         sendPacket(packet, socketPlayer);
     }
 
-    // Testing purpose => disconnect it
     if(serverPacket.id == 0x00 && serverPacket.state == SocketPlayerState.LOGIN) {
         const loginRequest = (<LoginStartPacket> serverPacket);
         let packet: Packet;
@@ -107,20 +108,21 @@ const handlePacket = (serverPacket: any, socketPlayer: SocketPlayer) => {
         } as LoginPacket;
 
         sendPacket(packet, socketPlayer);
+    }
 
-        packet = {
-            id: 0x38,
+    if(serverPacket.id == 0x07 && serverPacket.state == SocketPlayerState.PLAY) {
+
+        sendPacket({
+            id: 0x49,
             state: SocketPlayerState.PLAY,
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-            yaw: 0.0,
-            pitch: 0.0,
-            flags: 0x01,
-            teleportId: 1,
-            dismountVehicle: false,
-        } as SynchronizePlayerPositionPacket;
-        // sendPacket(packet, socketPlayer);
+            slot: 0,
+        } as SetHeldItemPacket, socketPlayer)
+
+        sendPacket({
+            id: 0x49,
+            state: SocketPlayerState.PLAY,
+            recipes: [],
+        } as UpdateRecipesPacket, socketPlayer)
     }
 }
 
@@ -128,10 +130,10 @@ const server = createServer((socket) => {
     const socketPlayer = initSocketPlayer(socket);
 
     socket.on("data", (buffer: Buffer) => {
-        const socketBuffer = new SocketBuffer(buffer);
-        while(socketBuffer.pos() != socketBuffer.buffer.length) {
-            const length = socketBuffer.readVarInt();
-            const packetId = socketBuffer.readVarInt();
+        const socketBuffer = SocketBuffer.fromBuffer(buffer);
+        while(socketBuffer.cursor != socketBuffer.buffer.length) {
+            const length = SocketBuffer.readVarInt(socketBuffer);
+            const packetId = SocketBuffer.readVarInt(socketBuffer);
 
             if(!ServerBoundPackets[socketPlayer.state][packetId]) {
                 console.error("ServerBoundPacket not implemented:", socketPlayer.state, packetId);

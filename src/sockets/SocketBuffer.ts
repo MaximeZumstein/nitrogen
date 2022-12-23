@@ -1,70 +1,109 @@
 import { Uuid } from "../utils/Uuid";
 
-class SocketBuffer {
-    public bufferPos = 0;
-    constructor(public buffer: Buffer) {}
+export type BufferCursor = {
+    cursor: number;
+    buffer: Buffer;
+}
 
-    readVarInt() {
-        let value = 0;
-        let pos = 0;
-        let byte;
-    
-        while(true) {
-            byte = this.buffer.readUInt8(this.bufferPos++);
-    
-            value |= (byte & 0x7F) << pos;
-            if((byte & 0X80) === 0) break;
-            pos += 7;
-    
-            if(pos >= 32) throw new Error("VarInt only 32 long");
-        }
-    
-        return value;
-    }
-
-    readBoolean() {
-        return this.buffer[this.bufferPos++] === 0x01;
-    }
-
-    readString() {
-        const length = this.readVarInt();
-        const value = this.buffer.subarray(this.bufferPos, this.bufferPos + length).toString('utf8');
-
-        this.bufferPos += length;
-        return value;
-    }
-
-    readUnsignedShort() {
-        const value = this.buffer.readUInt16BE(this.bufferPos);
-        this.bufferPos += 2;
-
-        return value;
-    }
-
-    readLong() {
-        const value = this.buffer.readBigInt64BE(this.bufferPos);
-        this.bufferPos += 8;
-
-        return value;
-    }
-
-    pos() {
-        return this.bufferPos;
+const fromBuffer = (buffer: Buffer): BufferCursor => {
+    return {
+        cursor: 0,
+        buffer,
     }
 }
 
-const readUuid = (buffer: SocketBuffer): Uuid => {
+const readBoolean = (buffer: BufferCursor): boolean => {
+    return buffer.buffer[buffer.cursor++] === 0x01;
+}
+
+const readByte = (buffer: BufferCursor): number => {
+    return buffer.buffer.readInt8(buffer.cursor++);
+}
+
+const readUnsignedByte = (buffer: BufferCursor): number => {
+    return buffer.buffer.readUInt8(buffer.cursor++);
+}
+
+const readShort = (buffer: BufferCursor): number => {
+    const value = buffer.buffer.readInt16BE(buffer.cursor);
+    buffer.cursor += 2;
+
+    return value;
+}
+
+const readUnsignedShort = (buffer: BufferCursor): number => {
+    const value = buffer.buffer.readUInt16BE(buffer.cursor);
+    buffer.cursor += 2;
+
+    return value;
+}
+
+const readInt = (buffer: BufferCursor): number => {
+    const value = buffer.buffer.readInt32BE(buffer.cursor);
+    buffer.cursor += 4;
+
+    return value;
+}
+
+const readLong = (buffer: BufferCursor): bigint => {
+    const value = buffer.buffer.readBigInt64BE(buffer.cursor);
+    buffer.cursor += 8;
+
+    return value;
+}
+
+const readFloat = (buffer: BufferCursor): number => {
+    const value = buffer.buffer.readFloatBE(buffer.cursor);
+    buffer.cursor += 4;
+
+    return value;
+}
+
+const readDouble = (buffer: BufferCursor): number => {
+    const value = buffer.buffer.readDoubleBE(buffer.cursor);
+    buffer.cursor += 8;
+
+    return value;
+}
+
+const readString = (buffer: BufferCursor): string => {
+    const length = readVarInt(buffer);
+    const value = buffer.buffer.subarray(buffer.cursor, buffer.cursor + length).toString('utf8');
+
+    buffer.cursor += length;
+    return value;
+}
+
+const readUuid = (buffer: BufferCursor): Uuid => {
     let uuid = "";
 
     for(let i = 0; i < 16; i++) {
         if([4, 6, 8, 10].indexOf(i) !== -1) {
             uuid += "-";
         }
-        uuid += buffer.buffer[buffer.bufferPos + i].toString(16).padStart(2, '0');
+        uuid += buffer.buffer[buffer.cursor + i].toString(16).padStart(2, '0');
     }
-    buffer.bufferPos += 16;
+    buffer.cursor += 16;
 
     return uuid;
+}
+
+const readVarInt = (buffer: BufferCursor): number => {
+    let value = 0;
+    let pos = 0;
+    let byte;
+
+    while(true) {
+        byte = buffer.buffer.readUInt8(buffer.cursor++);
+
+        value |= (byte & 0x7F) << pos;
+        if((byte & 0X80) === 0) break;
+        pos += 7;
+
+        if(pos >= 32) throw new Error("VarInt only 32 long");
+    }
+
+    return value;
 }
 
 const writeBoolean = (value: boolean): Buffer => {
@@ -164,4 +203,4 @@ const writePosition = (value: any): Buffer => {
     return Buffer.from([]);
 }
 
-export {SocketBuffer, writeBoolean, writeByte, writeUnsignedByte, writeShort, writeUnsignedShort, writeInt, writeLong, writeFloat, writeDouble, writeVarInt, writeString, writeUuid, writePosition, readUuid};
+export default {fromBuffer, readBoolean, readByte, readUnsignedByte, readShort, readUnsignedShort, readInt, readLong, readFloat, readDouble, readString, readVarInt, readUuid, writeBoolean, writeByte, writeUnsignedByte, writeShort, writeUnsignedShort, writeInt, writeLong, writeFloat, writeDouble, writeVarInt, writeString, writeUuid, writePosition};

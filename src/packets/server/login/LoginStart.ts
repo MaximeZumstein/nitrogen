@@ -1,4 +1,4 @@
-import { readUuid, SocketBuffer } from "../../../sockets/SocketBuffer";
+import SocketBuffer, { BufferCursor } from "../../../sockets/SocketBuffer";
 import { SocketPlayerState } from "../../../sockets/SocketPlayer";
 import { Uuid } from "../../../utils/Uuid";
 import { Packet } from "../../Packet";
@@ -9,16 +9,16 @@ export type LoginStartPacket = Packet & {
     playerUuid?: Uuid,
 }
 
-const LoginStart = (buffer: SocketBuffer): LoginStartPacket => {
+const LoginStart = (buffer: BufferCursor): LoginStartPacket => {
     const packet: LoginStartPacket = {
         id: 0x00,
         state: SocketPlayerState.LOGIN,
-        name: buffer.readString(),
-        hasPlayerUuid: buffer.readBoolean(),
+        name: SocketBuffer.readString(buffer),
+        hasPlayerUuid: SocketBuffer.readBoolean(buffer),
     };
 
     if(packet.hasPlayerUuid) {
-        packet.playerUuid = readUuid(buffer);
+        packet.playerUuid = SocketBuffer.readUuid(buffer);
     }
 
     return packet;

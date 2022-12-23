@@ -1,4 +1,4 @@
-import { writeVarInt, writeString, writeUuid } from "../../../sockets/SocketBuffer";
+import SocketBuffer from "../../../sockets/SocketBuffer";
 import { Uuid } from "../../../utils/Uuid";
 import { Packet } from "../../Packet";
 
@@ -10,13 +10,13 @@ export type LoginSuccessPacket = Packet & {
 
 const LoginSuccess = (packet: LoginSuccessPacket): Buffer => {
     const beforeLength = Buffer.concat([
-        writeVarInt(packet.id),
-        writeUuid(packet.uuid),
-        writeString(packet.username),
-        writeVarInt(packet.properties.length),
+        SocketBuffer.writeVarInt(packet.id),
+        SocketBuffer.writeUuid(packet.uuid),
+        SocketBuffer.writeString(packet.username),
+        SocketBuffer.writeVarInt(packet.properties.length),
         //TODO: each properties must be sent see https://wiki.vg/Protocol#Login_Success
     ]);
-    return Buffer.concat([writeVarInt(beforeLength.length), beforeLength]);
+    return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 
 export default LoginSuccess;

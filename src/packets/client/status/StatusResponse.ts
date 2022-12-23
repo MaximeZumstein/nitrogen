@@ -1,4 +1,4 @@
-import { writeString, writeVarInt } from "../../../sockets/SocketBuffer";
+import SocketBuffer from "../../../sockets/SocketBuffer";
 import { Packet } from "../../Packet";
 
 export type StatusResponsePacket = Packet & {
@@ -7,10 +7,10 @@ export type StatusResponsePacket = Packet & {
 
 const StatusResponse = (packet: StatusResponsePacket): Buffer => {
     const beforeLength = Buffer.concat([
-        writeVarInt(packet.id),
-        writeString(packet.jsonResponse)
+        SocketBuffer.writeVarInt(packet.id),
+        SocketBuffer.writeString(packet.jsonResponse)
     ]);
-    return Buffer.concat([writeVarInt(beforeLength.length), beforeLength]);
+    return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 
 export default StatusResponse;

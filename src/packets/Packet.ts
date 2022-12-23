@@ -1,4 +1,4 @@
-import { SocketBuffer } from "../sockets/SocketBuffer";
+import { BufferCursor } from "../sockets/SocketBuffer";
 import { SocketPlayerState } from "../sockets/SocketPlayer";
 
 export type Packet = {
@@ -7,7 +7,7 @@ export type Packet = {
 }
 
 export interface ServerPacketList {
-    [index: number]: (buffer: SocketBuffer) => Packet;
+    [index: number]: (buffer: BufferCursor) => Packet;
 }
 
 export interface ClientPacketList {

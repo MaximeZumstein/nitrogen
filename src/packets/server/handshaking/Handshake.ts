@@ -1,4 +1,4 @@
-import { SocketBuffer } from "../../../sockets/SocketBuffer";
+import SocketBuffer, { BufferCursor } from "../../../sockets/SocketBuffer";
 import { SocketPlayerState } from "../../../sockets/SocketPlayer";
 import { Packet } from "../../Packet";
 
@@ -9,14 +9,14 @@ export type HandshakePacket = Packet & {
     nextState: SocketPlayerState,
 }
 
-const Handshake = (buffer: SocketBuffer): HandshakePacket => {
+const Handshake = (buffer: BufferCursor): HandshakePacket => {
     return {
         id: 0x00,
         state: SocketPlayerState.HANDSHAKING,
-        protocolVersion: buffer.readVarInt(),
-        serverAddress: buffer.readString(),
-        serverPort: buffer.readUnsignedShort(),
-        nextState: buffer.readVarInt(),
+        protocolVersion: SocketBuffer.readVarInt(buffer),
+        serverAddress: SocketBuffer.readString(buffer),
+        serverPort: SocketBuffer.readUnsignedShort(buffer),
+        nextState: SocketBuffer.readVarInt(buffer),
     } 
 }
 

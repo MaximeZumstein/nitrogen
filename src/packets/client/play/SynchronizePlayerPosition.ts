@@ -1,4 +1,4 @@
-import { writeBoolean, writeByte, writeDouble, writeFloat, writeVarInt } from "../../../sockets/SocketBuffer";
+import SocketBuffer from "../../../sockets/SocketBuffer";
 import { Packet } from "../../Packet";
 
 export type SynchronizePlayerPositionPacket = Packet & {
@@ -14,17 +14,17 @@ export type SynchronizePlayerPositionPacket = Packet & {
 
 const SynchronizePlayerPosition = (packet: SynchronizePlayerPositionPacket): Buffer => {
     const beforeLength = Buffer.concat([
-        writeVarInt(packet.id),
-        writeDouble(packet.x),
-        writeDouble(packet.y),
-        writeDouble(packet.z),
-        writeFloat(packet.yaw),
-        writeFloat(packet.pitch),
-        writeByte(packet.flags),
-        writeVarInt(packet.teleportId),
-        writeBoolean(packet.dismountVehicle),
+        SocketBuffer.writeVarInt(packet.id),
+        SocketBuffer.writeDouble(packet.x),
+        SocketBuffer.writeDouble(packet.y),
+        SocketBuffer.writeDouble(packet.z),
+        SocketBuffer.writeFloat(packet.yaw),
+        SocketBuffer.writeFloat(packet.pitch),
+        SocketBuffer.writeByte(packet.flags),
+        SocketBuffer.writeVarInt(packet.teleportId),
+        SocketBuffer.writeBoolean(packet.dismountVehicle),
     ]);
-    return Buffer.concat([writeVarInt(beforeLength.length), beforeLength]);
+    return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 
 export default SynchronizePlayerPosition;

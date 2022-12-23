@@ -1,5 +1,5 @@
 import { encode, Tag } from "nbt-ts";
-import { writeVarInt, writeLong, writeString, writeInt, writeBoolean, writeUnsignedByte, writeByte, writePosition } from "../../../sockets/SocketBuffer";
+import SocketBuffer from "../../../sockets/SocketBuffer";
 import { Packet } from "../../Packet";
 
 export enum Gamemode {
@@ -31,31 +31,31 @@ export type LoginPacket = Packet & {
 
 const Login = (packet: LoginPacket): Buffer => {
     const beforeLength = Buffer.concat([
-        writeVarInt(packet.id),
-        writeInt(packet.entityId),
-        writeBoolean(packet.isHardcore),
-        writeUnsignedByte(packet.gamemode),
-        writeByte(packet.previousGamemode),
-        writeVarInt(packet.dimensions.length),
-        ...packet.dimensions.map((dimension) => writeString(dimension)),
+        SocketBuffer.writeVarInt(packet.id),
+        SocketBuffer.writeInt(packet.entityId),
+        SocketBuffer.writeBoolean(packet.isHardcore),
+        SocketBuffer.writeUnsignedByte(packet.gamemode),
+        SocketBuffer.writeByte(packet.previousGamemode),
+        SocketBuffer.writeVarInt(packet.dimensions.length),
+        ...packet.dimensions.map((dimension) => SocketBuffer.writeString(dimension)),
         encode("", packet.registryCode),
-        writeString(packet.dimensionType),
-        writeString(packet.dimensionName),
-        writeLong(packet.hashedSeed),
-        writeVarInt(packet.maxPlayers),
-        writeVarInt(packet.viewDistance),
-        writeVarInt(packet.simulationDistance),
-        writeBoolean(packet.reducedDebugInfo),
-        writeBoolean(packet.enableRespawnScreen),
-        writeBoolean(packet.isDebug),
-        writeBoolean(packet.isFlat),
-        writeBoolean(packet.deathLocation !== undefined),
+        SocketBuffer.writeString(packet.dimensionType),
+        SocketBuffer.writeString(packet.dimensionName),
+        SocketBuffer.writeLong(packet.hashedSeed),
+        SocketBuffer.writeVarInt(packet.maxPlayers),
+        SocketBuffer.writeVarInt(packet.viewDistance),
+        SocketBuffer.writeVarInt(packet.simulationDistance),
+        SocketBuffer.writeBoolean(packet.reducedDebugInfo),
+        SocketBuffer.writeBoolean(packet.enableRespawnScreen),
+        SocketBuffer.writeBoolean(packet.isDebug),
+        SocketBuffer.writeBoolean(packet.isFlat),
+        SocketBuffer.writeBoolean(packet.deathLocation !== undefined),
         ...(packet.deathLocation ? [
-            writeString(packet.deathLocation.dimension),
-            writePosition(packet.deathLocation.position),
+            SocketBuffer.writeString(packet.deathLocation.dimension),
+            SocketBuffer.writePosition(packet.deathLocation.position),
         ] : []),
     ]);
-    return Buffer.concat([writeVarInt(beforeLength.length), beforeLength]);
+    return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 
 export default Login;

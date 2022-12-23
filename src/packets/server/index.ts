@@ -2,6 +2,7 @@ import { SocketPlayerState } from "../../sockets/SocketPlayer";
 import { ServerPacketList } from "../Packet";
 import Handshake from "./handshaking/Handshake";
 import LoginStart from "./login/LoginStart";
+import ClientInformation from "./play/ClientInformation";
 import PingRequest from "./status/PingRequest";
 import StatusRequest from "./status/StatusRequest";
 
@@ -16,7 +17,9 @@ const ServerBoundPackets: Record<SocketPlayerState, ServerPacketList> = {
     [SocketPlayerState.LOGIN]: {
         0x00: LoginStart,
     },
-    [SocketPlayerState.PLAY]: {},
+    [SocketPlayerState.PLAY]: {
+        0x07: ClientInformation,
+    },
 }
 
 export {ServerBoundPackets};
