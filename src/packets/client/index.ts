@@ -1,4 +1,4 @@
-import { SocketPlayerState } from "../../sockets/SocketPlayer";
+import { SocketPlayerState } from "../../sockets/types";
 import { ClientPacketList } from "../Packet";
 import LoginSuccess from "./login/LoginSuccess";
 import Login from "./play/LoginPacket";

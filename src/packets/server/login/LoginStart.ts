@@ -1,5 +1,5 @@
 import SocketBuffer, { BufferCursor } from "../../../sockets/SocketBuffer";
-import { SocketPlayerState } from "../../../sockets/SocketPlayer";
+import { SocketPlayerState } from "../../../sockets/types";
 import { Uuid } from "../../../utils/Uuid";
 import { Packet } from "../../Packet";
 

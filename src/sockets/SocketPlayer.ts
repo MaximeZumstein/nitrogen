@@ -1,16 +1,7 @@
 import { Socket } from "net"
-
-export enum SocketPlayerState {
-    HANDSHAKING = -1,
-    STATUS = 1,
-    LOGIN = 2,
-    PLAY = 3,
-}
-
-export type SocketPlayer = {
-    socket: Socket,
-    state: SocketPlayerState
-}
+import { ClientBoundPackets } from "../packets/client"
+import { Packet } from "../packets/Packet"
+import { SocketPlayer, SocketPlayerState } from "./types"
 
 const initSocketPlayer = (socket: Socket): SocketPlayer => {
     return {
@@ -19,4 +10,9 @@ const initSocketPlayer = (socket: Socket): SocketPlayer => {
     }
 }
 
-export {initSocketPlayer}
+const sendPacket = (packet: Packet, socketPlayer: SocketPlayer) => {
+    const buffer = ClientBoundPackets[packet.state][packet.id](packet);
+    socketPlayer.socket.write(buffer);
+}
+
+export {initSocketPlayer, sendPacket}

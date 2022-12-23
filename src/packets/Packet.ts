@@ -1,5 +1,5 @@
 import { BufferCursor } from "../sockets/SocketBuffer";
-import { SocketPlayerState } from "../sockets/SocketPlayer";
+import { SocketPlayerState } from "../sockets/types";
 
 export type Packet = {
     id: number,
