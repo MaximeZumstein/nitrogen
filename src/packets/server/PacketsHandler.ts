@@ -3,9 +3,13 @@ import { SocketPlayer, SocketPlayerState } from "../../sockets/types";
 import { Registry } from "../../utils/Registry";
 import { ServerConfig } from "../../utils/ServerConfig";
 import { LoginSuccessPacket } from "../client/login/LoginSuccess";
+import { EntityEventPacket, EntityStatus } from "../client/play/EntityEvent";
 import { Gamemode, LoginPacket } from "../client/play/LoginPacket";
+import { SetCenterChunkPacket } from "../client/play/SetCenterChunk";
 import { SetHeldItemPacket } from "../client/play/SetHeldItem";
+import { SynchronizePlayerPositionPacket } from "../client/play/SynchronizePlayerPosition";
 import { UpdateRecipesPacket } from "../client/play/UpdateRecipes";
+import { UpdateTagsPacket } from "../client/play/UpdateTags";
 import { PingResponsePacket } from "../client/status/PingResponse";
 import { StatusResponsePacket } from "../client/status/StatusResponse";
 import { Packet } from "../Packet";
@@ -51,7 +55,6 @@ export const PacketsHandler: Record<SocketPlayerState, Record<number, (packet: P
     [SocketPlayerState.LOGIN]: {
         0x00: (packet, socketPlayer) => {
             socketPlayer.state = SocketPlayerState.PLAY;
-
             sendPacket({
                 id: 0x02,
                 state: SocketPlayerState.LOGIN,
@@ -91,10 +94,44 @@ export const PacketsHandler: Record<SocketPlayerState, Record<number, (packet: P
             } as SetHeldItemPacket, socketPlayer)
     
             sendPacket({
-                id: 0x49,
+                id: 0x69,
                 state: SocketPlayerState.PLAY,
                 recipes: [],
             } as UpdateRecipesPacket, socketPlayer)
+
+            sendPacket({
+                id: 0x6A,
+                state: SocketPlayerState.PLAY,
+                tags: [],
+            } as UpdateTagsPacket, socketPlayer)
+
+            sendPacket({
+                id: 0x19,
+                state: SocketPlayerState.PLAY,
+                entityId: 1,
+                entityStatus: EntityStatus.OP_LEVEL_4
+            } as EntityEventPacket, socketPlayer)
+
+            sendPacket({
+                id: 0x4a,
+                state: SocketPlayerState.PLAY,
+                chunkX: 0,
+                chunkZ: 0,
+            } as SetCenterChunkPacket, socketPlayer)
+            
+
+            // sendPacket({
+            //     id: 0x49,
+            //     state: SocketPlayerState.PLAY,
+            //     x: 0,
+            //     y: 0,
+            //     z: 0,
+            //     pitch: 0,
+            //     yaw: 0,
+            //     flags: 0,
+            //     teleportId: 0,
+            //     dismountVehicle: false,
+            // } as SynchronizePlayerPositionPacket, socketPlayer)
         }
     },    
 }

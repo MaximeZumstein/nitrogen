@@ -68,9 +68,8 @@ const readDouble = (buffer: BufferCursor): number => {
 
 const readString = (buffer: BufferCursor): string => {
     const length = readVarInt(buffer);
-    const value = buffer.buffer.subarray(buffer.cursor, buffer.cursor + length).toString('utf8');
+    const value = buffer.buffer.subarray(buffer.cursor, buffer.cursor += length).toString('utf8');
 
-    buffer.cursor += length;
     return value;
 }
 

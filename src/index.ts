@@ -11,20 +11,31 @@ const server = createServer((socket) => {
     socket.on("data", (buffer: Buffer) => {
         const socketBuffer = SocketBuffer.fromBuffer(buffer);
         while(socketBuffer.cursor != socketBuffer.buffer.length) {
+            const startPartPos = socketBuffer.cursor;
+
             const length = SocketBuffer.readVarInt(socketBuffer);
+            const lengthSize = socketBuffer.cursor - startPartPos;
+
             const packetId = SocketBuffer.readVarInt(socketBuffer);
+            const packetBuffer = SocketBuffer.fromBuffer(socketBuffer.buffer.subarray(startPartPos, startPartPos + lengthSize + length));
+            packetBuffer.cursor = socketBuffer.cursor - startPartPos;
+            socketBuffer.cursor = startPartPos + lengthSize + length;
 
             if(!ServerBoundPackets[socketPlayer.state][packetId]) {
                 console.error("ServerBoundPacket not implemented:", socketPlayer.state, packetId);
-                socket.end();
+                // socket.end();
                 return;
             }
     
             const packetFn = ServerBoundPackets[socketPlayer.state][packetId];
-            const serverPacket = packetFn(socketBuffer);
+            const serverPacket = packetFn(packetBuffer, length);
 
             if(PacketsHandler[serverPacket.state][serverPacket.id]) {
                 PacketsHandler[serverPacket.state][serverPacket.id](serverPacket, socketPlayer);
+            }
+
+            if(packetBuffer.cursor != packetBuffer.buffer.length) {
+                console.warn("More to read on buffer", packetBuffer);
             }
         }
 

@@ -7,7 +7,7 @@ export type Packet = {
 }
 
 export interface ServerPacketList {
-    [index: number]: (buffer: BufferCursor) => Packet;
+    [index: number]: (buffer: BufferCursor, length: number) => Packet;
 }
 
 export interface ClientPacketList {
