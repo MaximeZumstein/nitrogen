@@ -9,6 +9,7 @@ export enum EntityStatus {
 export type EntityEventPacket = Packet & {
     id: 0x19,
     state: SocketPlayerState.PLAY,
+
     entityId: number,
     entityStatus: EntityStatus
 }
@@ -16,9 +17,11 @@ export type EntityEventPacket = Packet & {
 const EntityEvent = (packet: EntityEventPacket): Buffer => {
     const beforeLength = Buffer.concat([
         SocketBuffer.writeVarInt(packet.id),
+
         SocketBuffer.writeInt(packet.entityId),
         SocketBuffer.writeByte(packet.entityStatus),
     ]);
+
     return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 

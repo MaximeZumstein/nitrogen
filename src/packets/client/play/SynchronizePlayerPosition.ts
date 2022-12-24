@@ -1,7 +1,11 @@
 import SocketBuffer from "../../../sockets/SocketBuffer";
+import { SocketPlayerState } from "../../../sockets/types";
 import { Packet } from "../../Packet";
 
 export type SynchronizePlayerPositionPacket = Packet & {
+    id: 0x38,
+    state: SocketPlayerState.PLAY,
+
     x: number,
     y: number,
     z: number,
@@ -15,6 +19,7 @@ export type SynchronizePlayerPositionPacket = Packet & {
 const SynchronizePlayerPosition = (packet: SynchronizePlayerPositionPacket): Buffer => {
     const beforeLength = Buffer.concat([
         SocketBuffer.writeVarInt(packet.id),
+
         SocketBuffer.writeDouble(packet.x),
         SocketBuffer.writeDouble(packet.y),
         SocketBuffer.writeDouble(packet.z),
@@ -24,6 +29,7 @@ const SynchronizePlayerPosition = (packet: SynchronizePlayerPositionPacket): Buf
         SocketBuffer.writeVarInt(packet.teleportId),
         SocketBuffer.writeBoolean(packet.dismountVehicle),
     ]);
+
     return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 

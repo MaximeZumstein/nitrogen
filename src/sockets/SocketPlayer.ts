@@ -13,6 +13,8 @@ const initSocketPlayer = (socket: Socket): SocketPlayer => {
 const sendPacket = (packet: Packet, socketPlayer: SocketPlayer) => {
     const buffer = ClientBoundPackets[packet.state][packet.id](packet);
     socketPlayer.socket.write(buffer);
+
+    console.log(buffer);
 }
 
 export {initSocketPlayer, sendPacket}

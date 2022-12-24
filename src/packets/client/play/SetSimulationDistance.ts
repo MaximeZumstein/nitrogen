@@ -2,21 +2,21 @@ import SocketBuffer from "../../../sockets/SocketBuffer";
 import { SocketPlayerState } from "../../../sockets/types";
 import { Packet } from "../../Packet";
 
-export type UpdateRecipesPacket = Packet & {
-    id: 0x69,
+export type SetSimulationDistancePacket = Packet & {
+    id: 0x58,
     state: SocketPlayerState.PLAY,
 
-    recipes: any[],
+    distance: number,
 }
 
-const UpdateRecipes = (packet: UpdateRecipesPacket): Buffer => {
+const SetSimulationDistance = (packet: SetSimulationDistancePacket): Buffer => {
     const beforeLength = Buffer.concat([
         SocketBuffer.writeVarInt(packet.id),
 
-        SocketBuffer.writeVarInt(0),
+        SocketBuffer.writeVarInt(packet.distance),
     ]);
 
     return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 
-export default UpdateRecipes;
+export default SetSimulationDistance;

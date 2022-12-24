@@ -1,9 +1,13 @@
 import { Uuid } from "../utils/Uuid";
+import { Location } from "../world/Location";
 
 export type BufferCursor = {
     cursor: number;
     buffer: Buffer;
 }
+
+const SEGMENT_BITS = 0x7F;
+const CONTINUE_BIT = 0x80;
 
 const fromBuffer = (buffer: Buffer): BufferCursor => {
     return {
@@ -95,7 +99,7 @@ const readVarInt = (buffer: BufferCursor): number => {
     while(true) {
         byte = buffer.buffer.readUInt8(buffer.cursor++);
 
-        value |= (byte & 0x7F) << pos;
+        value |= (byte & SEGMENT_BITS) << pos;
         if((byte & 0X80) === 0) break;
         pos += 7;
 
@@ -170,13 +174,30 @@ const writeVarInt = (value: number): Buffer => {
     let bytes:number[] = [];
 
     while(true) {
-        if((value & ~0x7F) == 0) {
+        if((value & ~SEGMENT_BITS) == 0) {
             bytes.push(value);
             break;
         }
 
-        bytes.push((value & 0x7F) | 0x80);
+        bytes.push((value & SEGMENT_BITS) | CONTINUE_BIT);
         value >>>= 7;
+    }
+
+    return Buffer.from(bytes);
+}
+
+const writeVarLong = (value: bigint): Buffer => {
+    value = BigInt.asUintN(64, value);
+    let bytes:number[] = [];
+
+    while (true) {
+        if ((value & ~BigInt(SEGMENT_BITS)) == 0n) {
+            bytes.push(Number(value));
+            break;
+        }
+
+        bytes.push(Number((value & BigInt(SEGMENT_BITS)) | BigInt(CONTINUE_BIT)));
+        value >>= 7n;
     }
 
     return Buffer.from(bytes);
@@ -198,8 +219,12 @@ const writeString = (value: string): Buffer => {
     return Buffer.concat([writeVarInt(value.length) , buffer]);
 }
 
-const writePosition = (value: any): Buffer => {
-    return Buffer.from([]);
+const writePosition = (value: Location): Buffer => {
+    return writeLong(
+        (BigInt(value.x & 0x3FFFFFF) << 38n) |
+        (BigInt(value.z & 0x3FFFFFF) << 12n) |
+        (BigInt(value.y & 0xFFF))
+    );
 }
 
-export default {fromBuffer, readBoolean, readByte, readUnsignedByte, readShort, readUnsignedShort, readInt, readLong, readFloat, readDouble, readString, readVarInt, readUuid, writeBoolean, writeByte, writeUnsignedByte, writeShort, writeUnsignedShort, writeInt, writeLong, writeFloat, writeDouble, writeVarInt, writeString, writeUuid, writePosition};
+export default {fromBuffer, readBoolean, readByte, readUnsignedByte, readShort, readUnsignedShort, readInt, readLong, readFloat, readDouble, readString, readVarInt, readUuid, writeBoolean, writeByte, writeUnsignedByte, writeShort, writeUnsignedShort, writeInt, writeLong, writeFloat, writeDouble, writeVarInt, writeVarLong, writeString, writeUuid, writePosition};

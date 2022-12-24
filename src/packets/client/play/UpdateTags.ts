@@ -1,4 +1,5 @@
 import SocketBuffer from "../../../sockets/SocketBuffer";
+import { SocketPlayerState } from "../../../sockets/types";
 import { Packet } from "../../Packet";
 
 type Tag = {
@@ -12,12 +13,16 @@ type TagsBag = {
 }
 
 export type UpdateTagsPacket = Packet & {
+    id: 0x6A,
+    state: SocketPlayerState.PLAY,
+
     tags: TagsBag[],
 }
 
 const UpdateTags = (packet: UpdateTagsPacket): Buffer => {
-    return Buffer.concat([
+    const beforeLength = Buffer.concat([
         SocketBuffer.writeVarInt(packet.id),
+
         SocketBuffer.writeVarInt(packet.tags.length),
         ...packet.tags.map(tagBag => Buffer.concat([
             SocketBuffer.writeString(tagBag.type),
@@ -29,6 +34,8 @@ const UpdateTags = (packet: UpdateTagsPacket): Buffer => {
             ]))
         ])),
     ]);
+
+    return Buffer.concat([SocketBuffer.writeVarInt(beforeLength.length), beforeLength]);
 }
 
 export default UpdateTags;
