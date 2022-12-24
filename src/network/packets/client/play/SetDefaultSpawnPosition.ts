@@ -1,6 +1,6 @@
 import SocketBuffer from "../../../sockets/SocketBuffer";
 import { SocketPlayerState } from "../../../sockets/types";
-import { Location } from "../../../world/Location";
+import { Location } from "../../../../world/Location";
 import { Packet } from "../../Packet";
 
 export type SetDefaultSpawnPositionPacket = Packet & {

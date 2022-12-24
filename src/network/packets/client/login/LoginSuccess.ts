@@ -1,5 +1,5 @@
 import SocketBuffer from "../../../sockets/SocketBuffer";
-import { Uuid } from "../../../utils/Uuid";
+import { Uuid } from "../../../../utils/Uuid";
 import { Packet } from "../../Packet";
 
 export type LoginSuccessPacket = Packet & {

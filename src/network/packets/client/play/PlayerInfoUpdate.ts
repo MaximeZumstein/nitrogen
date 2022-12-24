@@ -1,6 +1,6 @@
 import SocketBuffer from "../../../sockets/SocketBuffer";
 import { SocketPlayerState } from "../../../sockets/types";
-import { Uuid } from "../../../utils/Uuid";
+import { Uuid } from "../../../../utils/Uuid";
 import { Packet } from "../../Packet";
 
 export enum ActionType {

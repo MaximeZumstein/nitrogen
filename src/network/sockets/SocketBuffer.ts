@@ -1,5 +1,5 @@
-import { Uuid } from "../utils/Uuid";
-import { Location } from "../world/Location";
+import { Uuid } from "../../utils/Uuid";
+import { Location } from "../../world/Location";
 
 export type BufferCursor = {
     cursor: number;

@@ -1,7 +1,7 @@
 import { sendPacket } from "../../sockets/SocketPlayer";
 import { SocketPlayer, SocketPlayerState } from "../../sockets/types";
-import { Registry } from "../../utils/Registry";
-import { ServerConfig } from "../../utils/ServerConfig";
+import { Registry } from "../../../utils/Registry";
+import { ServerConfig } from "../../../utils/ServerConfig";
 import { LoginSuccessPacket } from "../client/login/LoginSuccess";
 import { ChangeDifficultyPacket } from "../client/play/ChangeDifficulty";
 import { CommandsPacket } from "../client/play/Commands";

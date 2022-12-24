@@ -1,9 +1,8 @@
 import { createServer } from "net";
-import { ServerBoundPackets } from "./packets/server";
-import { PacketsHandler } from "./packets/server/PacketsHandler";
-import SocketBuffer from "./sockets/SocketBuffer";
-import { initSocketPlayer } from "./sockets/SocketPlayer";
-
+import { ServerBoundPackets } from "./network/packets/server";
+import { PacketsHandler } from "./network/packets/server/PacketsHandler";
+import SocketBuffer from "./network/sockets/SocketBuffer";
+import { initSocketPlayer } from "./network/sockets/SocketPlayer";
 
 const server = createServer((socket) => {
     const socketPlayer = initSocketPlayer(socket);
